@@ -30,7 +30,6 @@
     color-scheme: light dark;
     color: rgba(255, 255, 255, 0.87);
     background-color: #242424;
-
   }
 
   h1 {
@@ -241,27 +240,48 @@
     $score.innerHTML = score;
   }
 
+  let intervals = {
+    left: null,
+    right: null,
+    down: null,
+  };
+
   document.addEventListener("keydown", (event) => {
     if (event.key === EVENT_MOVEMENTS.LEFT) {
-      piece.position.x--;
-      if (checkCollision()) {
-        piece.position.x++;
+      if (!intervals.left) {
+        intervals.left = setInterval(() => {
+          piece.position.x--;
+          if (checkCollision()) {
+            piece.position.x++;
+          }
+          draw();
+        }, 100); // Ajusta la velocidad del movimiento lateral
       }
     }
 
     if (event.key === EVENT_MOVEMENTS.RIGHT) {
-      piece.position.x++;
-      if (checkCollision()) {
-        piece.position.x--;
+      if (!intervals.right) {
+        intervals.right = setInterval(() => {
+          piece.position.x++;
+          if (checkCollision()) {
+            piece.position.x--;
+          }
+          draw();
+        }, 100); // Ajusta la velocidad del movimiento lateral
       }
     }
 
     if (event.key === EVENT_MOVEMENTS.DOWN) {
-      piece.position.y++;
-      if (checkCollision()) {
-        piece.position.y--;
-        solidifyPiece();
-        removeRows();
+      if (!intervals.down) {
+        intervals.down = setInterval(() => {
+          piece.position.y++;
+          if (checkCollision()) {
+            piece.position.y--;
+            solidifyPiece();
+            removeRows();
+          }
+          draw();
+        }, 100); // Ajusta la velocidad de descenso
       }
     }
 
@@ -283,6 +303,23 @@
       if (checkCollision()) {
         piece.shape = previousShape;
       }
+    }
+  });
+
+  document.addEventListener("keyup", (event) => {
+    if (event.key === EVENT_MOVEMENTS.LEFT) {
+      clearInterval(intervals.left);
+      intervals.left = null;
+    }
+
+    if (event.key === EVENT_MOVEMENTS.RIGHT) {
+      clearInterval(intervals.right);
+      intervals.right = null;
+    }
+
+    if (event.key === EVENT_MOVEMENTS.DOWN) {
+      clearInterval(intervals.down);
+      intervals.down = null;
     }
   });
 
