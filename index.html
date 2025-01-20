@@ -213,10 +213,77 @@
       handleInput(event.key);
     });
 
-    document.getElementById("left").addEventListener("click", () => handleInput(EVENT_MOVEMENTS.LEFT));
-    document.getElementById("right").addEventListener("click", () => handleInput(EVENT_MOVEMENTS.RIGHT));
-    document.getElementById("down").addEventListener("click", () => handleInput(EVENT_MOVEMENTS.DOWN));
-    document.getElementById("rotate").addEventListener("click", () => handleInput(EVENT_MOVEMENTS.ROTATE));
+    const intervals = {
+      left: null,
+      right: null,
+      down: null,
+    };
+
+    // Función para manejar el inicio del movimiento continuo
+    function startTouchMovement(direction) {
+      if (!intervals[direction]) {
+        intervals[direction] = setInterval(() => {
+          if (direction === "left") {
+            piece.position.x--;
+            if (checkCollision()) {
+              piece.position.x++;
+            }
+          } else if (direction === "right") {
+            piece.position.x++;
+            if (checkCollision()) {
+              piece.position.x--;
+            }
+          } else if (direction === "down") {
+            piece.position.y++;
+            if (checkCollision()) {
+              piece.position.y--;
+              solidifyPiece();
+              removeRows();
+            }
+          }
+          draw();
+        }, 100); // Ajusta la velocidad del movimiento
+      }
+    }
+
+    // Función para detener el movimiento continuo
+    function stopTouchMovement(direction) {
+      clearInterval(intervals[direction]);
+      intervals[direction] = null;
+    }
+
+    // Configurar eventos para los botones en dispositivos táctiles
+    document
+      .getElementById("left")
+      .addEventListener("touchstart", () => startTouchMovement("left"));
+    document
+      .getElementById("left")
+      .addEventListener("touchend", () => stopTouchMovement("left"));
+    document
+      .getElementById("right")
+      .addEventListener("touchstart", () => startTouchMovement("right"));
+    document
+      .getElementById("right")
+      .addEventListener("touchend", () => stopTouchMovement("right"));
+    document
+      .getElementById("down")
+      .addEventListener("touchstart", () => startTouchMovement("down"));
+    document
+      .getElementById("down")
+      .addEventListener("touchend", () => stopTouchMovement("down"));
+
+    document
+      .getElementById("left")
+      .addEventListener("click", () => handleInput(EVENT_MOVEMENTS.LEFT));
+    document
+      .getElementById("right")
+      .addEventListener("click", () => handleInput(EVENT_MOVEMENTS.RIGHT));
+    document
+      .getElementById("down")
+      .addEventListener("click", () => handleInput(EVENT_MOVEMENTS.DOWN));
+    document
+      .getElementById("rotate")
+      .addEventListener("click", () => handleInput(EVENT_MOVEMENTS.ROTATE));
 
     function handleInput(key) {
       if (key === EVENT_MOVEMENTS.LEFT) {
